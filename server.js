@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,7 +20,6 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.get('*', (req, res) => {
     // Check if the requested path maps to an actual file
     const filePath = path.join(__dirname, 'public', req.path);
-    const fs = require('fs');
     
     // If it's a directory, try to serve index.html from it
     if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
