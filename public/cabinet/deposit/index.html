@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deposit - Pocket Option</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;background:#1b222f;color:#d1d4dc;min-height:100vh;display:flex}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#171e28}
+::-webkit-scrollbar-thumb{background:#2a3444;border-radius:3px}
+.sidebar{width:60px;background:#171e28;border-right:1px solid rgba(115,130,153,0.15);display:flex;flex-direction:column;align-items:center;padding:12px 0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar-logo{width:36px;height:36px;background:linear-gradient(135deg,#00b6f9,#0090d9);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-weight:700;color:#fff;font-size:14px}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px;width:100%;align-items:center}
+.sidebar-nav a{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#5c6a7a;text-decoration:none;font-size:18px;transition:all .2s}
+.sidebar-nav a:hover{background:rgba(0,182,249,0.1);color:#00b6f9}
+.sidebar-nav a.active{background:rgba(0,182,249,0.15);color:#00b6f9}
+.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px;align-items:center}
+.main{margin-left:60px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{height:56px;background:#171e28;border-bottom:1px solid rgba(115,130,153,0.15);display:flex;align-items:center;padding:0 24px;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-title{font-size:15px;font-weight:600}
+.balance-display{display:flex;align-items:center;gap:8px;background:rgba(0,182,249,0.1);padding:6px 14px;border-radius:8px}
+.balance-label{font-size:11px;color:#5c6a7a}
+.balance-value{font-size:15px;font-weight:700;color:#00b6f9}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{background:none;border:none;color:#5c6a7a;font-size:18px;cursor:pointer;padding:6px;border-radius:6px;transition:all .2s}
+.topbar-btn:hover{color:#d1d4dc;background:rgba(255,255,255,0.05)}
+.content{flex:1;padding:24px;max-width:900px;width:100%}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-header p{color:#5c6a7a;font-size:13px}
+.section{background:#171e28;border:1px solid rgba(115,130,153,0.15);border-radius:12px;padding:24px;margin-bottom:20px}
+.section-title{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title i{color:#00b6f9}
+
+.methods-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.method-card{background:#1b222f;border:2px solid rgba(115,130,153,0.15);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.method-card:hover{border-color:rgba(0,182,249,0.3)}
+.method-card.selected{border-color:#00b6f9;background:rgba(0,182,249,0.05)}
+.method-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.method-icon.visa{background:rgba(26,110,199,0.15);color:#1a6ec7}
+.method-icon.btc{background:rgba(247,147,26,0.15);color:#f7931a}
+.method-icon.eth{background:rgba(98,126,234,0.15);color:#627eea}
+.method-icon.usdt{background:rgba(38,161,123,0.15);color:#26a17b}
+.method-icon.bank{background:rgba(0,182,249,0.15);color:#00b6f9}
+.method-name{font-size:13px;font-weight:600}
+.method-desc{font-size:11px;color:#5c6a7a}
+
+.amount-section{margin-top:20px}
+.amount-label{font-size:12px;color:#5c6a7a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-weight:600}
+.amount-input-wrap{display:flex;align-items:center;background:#1b222f;border:1px solid rgba(115,130,153,0.15);border-radius:8px;overflow:hidden;margin-bottom:12px}
+.amount-input-wrap:focus-within{border-color:#00b6f9}
+.amount-prefix{padding:12px 14px;font-size:18px;font-weight:700;color:#5c6a7a;border-right:1px solid rgba(115,130,153,0.15)}
+.amount-input{flex:1;background:none;border:none;padding:12px 14px;color:#d1d4dc;font-size:18px;font-weight:600;font-family:inherit;outline:none}
+.quick-amounts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.quick-btn{padding:8px 16px;background:#1b222f;border:1px solid rgba(115,130,153,0.15);border-radius:6px;color:#d1d4dc;font-size:13px;cursor:pointer;transition:all .2s;font-family:inherit}
+.quick-btn:hover{border-color:#00b6f9;color:#00b6f9}
+.quick-btn.active{background:rgba(0,182,249,0.15);border-color:#00b6f9;color:#00b6f9}
+.amount-limits{font-size:11px;color:#5c6a7a;margin-top:4px}
+
+.bonus-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px;background:#1b222f;border-radius:8px;margin-bottom:20px}
+.bonus-info h4{font-size:14px;font-weight:600;color:#45b734}
+.bonus-info p{font-size:12px;color:#5c6a7a}
+.toggle{width:44px;height:24px;background:#2a3444;border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.active{background:#00b6f9}
+.toggle::after{content:'';width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .2s}
+.toggle.active::after{transform:translateX(20px)}
+
+.deposit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#00b6f9,#0090d9);border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.deposit-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,182,249,0.3)}
+.deposit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#171e28;border:1px solid rgba(69,183,52,0.3);color:#45b734;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:1000;display:none;animation:slideUp .3s}
+.toast.show{display:flex;align-items:center;gap:8px}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:200}
+.modal-overlay.show{display:flex}
+.modal{background:#171e28;border:1px solid rgba(115,130,153,0.15);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center}
+.modal-icon{width:64px;height:64px;border-radius:50%;background:rgba(69,183,52,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:#45b734}
+.modal h2{font-size:20px;font-weight:700;margin-bottom:8px}
+.modal p{color:#5c6a7a;font-size:13px;margin-bottom:20px}
+.modal .btn{padding:10px 32px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;background:#00b6f9;color:#fff}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">PO</div>
+  <nav class="sidebar-nav">
+    <a href="/pages/trading/" title="Trading"><i class="fas fa-chart-line"></i></a>
+    <a href="/pages/cabinet/profile/" title="Profile"><i class="fas fa-user"></i></a>
+    <a href="/pages/cabinet/deposit/" title="Deposit" class="active"><i class="fas fa-wallet"></i></a>
+    <a href="/pages/cabinet/withdrawal/" title="Withdrawal"><i class="fas fa-arrow-up"></i></a>
+    <a href="/pages/cabinet/history/" title="History"><i class="fas fa-history"></i></a>
+    <a href="/pages/cabinet/achievements/" title="Achievements"><i class="fas fa-trophy"></i></a>
+    <a href="/pages/cabinet/settings/" title="Settings"><i class="fas fa-cog"></i></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a href="/pages/cabinet/settings/" title="Settings"><i class="fas fa-cog"></i></a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Deposit</span>
+    </div>
+    <div class="topbar-right">
+      <div class="balance-display">
+        <span class="balance-label">Balance</span>
+        <span class="balance-value" id="topBalance">$10,000.00</span>
+      </div>
+      <button class="topbar-btn" title="Notifications"><i class="fas fa-bell"></i></button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="page-header">
+      <h1>Deposit Funds</h1>
+      <p>Add funds to your trading account</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-credit-card"></i> Payment Method</div>
+      <div class="methods-grid">
+        <div class="method-card selected" data-method="visa" onclick="selectMethod(this)">
+          <div class="method-icon visa"><i class="fab fa-cc-visa"></i></div>
+          <div class="method-name">Visa / Mastercard</div>
+          <div class="method-desc">Instant processing</div>
+        </div>
+        <div class="method-card" data-method="btc" onclick="selectMethod(this)">
+          <div class="method-icon btc"><i class="fab fa-bitcoin"></i></div>
+          <div class="method-name">Bitcoin</div>
+          <div class="method-desc">10-30 min</div>
+        </div>
+        <div class="method-card" data-method="eth" onclick="selectMethod(this)">
+          <div class="method-icon eth"><i class="fab fa-ethereum"></i></div>
+          <div class="method-name">Ethereum</div>
+          <div class="method-desc">5-15 min</div>
+        </div>
+        <div class="method-card" data-method="usdt_trc20" onclick="selectMethod(this)">
+          <div class="method-icon usdt"><i class="fas fa-dollar-sign"></i></div>
+          <div class="method-name">USDT (TRC20)</div>
+          <div class="method-desc">Instant processing</div>
+        </div>
+        <div class="method-card" data-method="usdt_bep20" onclick="selectMethod(this)">
+          <div class="method-icon usdt"><i class="fas fa-dollar-sign"></i></div>
+          <div class="method-name">USDT (BEP20)</div>
+          <div class="method-desc">Instant processing</div>
+        </div>
+        <div class="method-card" data-method="bank" onclick="selectMethod(this)">
+          <div class="method-icon bank"><i class="fas fa-university"></i></div>
+          <div class="method-name">Bank Transfer</div>
+          <div class="method-desc">1-3 business days</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-dollar-sign"></i> Deposit Amount</div>
+      <div class="amount-section">
+        <div class="amount-label">Enter amount</div>
+        <div class="amount-input-wrap">
+          <span class="amount-prefix">$</span>
+          <input type="number" class="amount-input" id="depositAmount" value="100" min="1" max="50000" step="0.01" oninput="updateAmount()">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(10)">$10</button>
+          <button class="quick-btn active" onclick="setAmount(100)">$100</button>
+          <button class="quick-btn" onclick="setAmount(500)">$500</button>
+          <button class="quick-btn" onclick="setAmount(1000)">$1,000</button>
+          <button class="quick-btn" onclick="setAmount(5000)">$5,000</button>
+          <button class="quick-btn" onclick="setAmount(10000)">$10,000</button>
+        </div>
+        <div class="amount-limits">Minimum deposit: $1.00 &middot; Maximum deposit: $50,000.00</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="bonus-toggle">
+        <div class="bonus-info">
+          <h4><i class="fas fa-gift"></i> Deposit Bonus +50%</h4>
+          <p>Get 50% extra on your first deposit up to $500</p>
+        </div>
+        <div class="toggle" id="bonusToggle" onclick="toggleBonus()"></div>
+      </div>
+
+      <div id="summaryArea" style="padding:12px;background:#1b222f;border-radius:8px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px">
+          <span style="color:#5c6a7a">Deposit amount</span>
+          <span id="summaryAmount">$100.00</span>
+        </div>
+        <div id="bonusLine" style="display:none;justify-content:space-between;margin-bottom:8px;font-size:13px">
+          <span style="color:#45b734">Bonus (+50%)</span>
+          <span id="summaryBonus" style="color:#45b734">+$50.00</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(115,130,153,0.15);font-size:14px;font-weight:700">
+          <span>Total</span>
+          <span id="summaryTotal" style="color:#00b6f9">$100.00</span>
+        </div>
+      </div>
+
+      <button class="deposit-btn" id="depositBtn" onclick="makeDeposit()">
+        <i class="fas fa-lock"></i>&nbsp; Deposit $100.00
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon"><i class="fas fa-check"></i></div>
+    <h2>Deposit Successful!</h2>
+    <p id="modalMsg">Your deposit of $100.00 has been processed successfully.</p>
+    <button class="btn" onclick="closeModal()">Continue Trading</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+<script src="/js/modules/api.js"></script>
+<script>
+if (!localStorage.getItem('po_logged_in')) {
+  window.location.href = '/pages/login/';
+}
+
+let user = JSON.parse(localStorage.getItem('po_user') || '{"balance":10000}');
+let selectedMethod = 'visa';
+let bonusActive = false;
+
+function formatMoney(n) {
+  return '$' + Number(n || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function init() {
+  document.getElementById('topBalance').textContent = formatMoney(user.balance);
+  updateAmount();
+}
+
+function selectMethod(el) {
+  document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMethod = el.dataset.method;
+}
+
+function setAmount(val) {
+  document.getElementById('depositAmount').value = val;
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateAmount();
+}
+
+function updateAmount() {
+  const amt = parseFloat(document.getElementById('depositAmount').value) || 0;
+  const bonus = bonusActive ? amt * 0.5 : 0;
+  const total = amt + bonus;
+  document.getElementById('summaryAmount').textContent = formatMoney(amt);
+  document.getElementById('summaryBonus').textContent = '+' + formatMoney(bonus);
+  document.getElementById('summaryTotal').textContent = formatMoney(total);
+  document.getElementById('bonusLine').style.display = bonusActive ? 'flex' : 'none';
+  document.getElementById('depositBtn').textContent = '';
+  document.getElementById('depositBtn').innerHTML = '<i class="fas fa-lock"></i>&nbsp; Deposit ' + formatMoney(amt);
+  document.getElementById('depositBtn').disabled = amt < 1 || amt > 50000;
+}
+
+function toggleBonus() {
+  bonusActive = !bonusActive;
+  document.getElementById('bonusToggle').classList.toggle('active', bonusActive);
+  updateAmount();
+}
+
+function makeDeposit() {
+  const amt = parseFloat(document.getElementById('depositAmount').value) || 0;
+  if (amt < 1 || amt > 50000) return;
+  const bonus = bonusActive ? amt * 0.5 : 0;
+  const total = amt + bonus;
+
+  user.balance = (user.balance || 0) + total;
+  user.totalDeposits = (user.totalDeposits || 0) + amt;
+  localStorage.setItem('po_user', JSON.stringify(user));
+
+  const trades = JSON.parse(localStorage.getItem('po_trades') || '[]');
+  trades.unshift({
+    id: 'dep_' + Date.now(),
+    type: 'deposit',
+    method: selectedMethod,
+    amount: amt,
+    bonus: bonus,
+    total: total,
+    date: new Date().toISOString(),
+    status: 'completed'
+  });
+  localStorage.setItem('po_trades', JSON.stringify(trades));
+
+  document.getElementById('topBalance').textContent = formatMoney(user.balance);
+  document.getElementById('modalMsg').textContent = 'Your deposit of ' + formatMoney(amt) + (bonus > 0 ? ' (+' + formatMoney(bonus) + ' bonus)' : '') + ' has been processed successfully.';
+  document.getElementById('successModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('successModal').classList.remove('show');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+init();
+</script>
+</body>
+</html>

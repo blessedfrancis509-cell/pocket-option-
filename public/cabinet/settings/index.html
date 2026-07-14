@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings - Pocket Option</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;background:#1b222f;color:#d1d4dc;min-height:100vh;display:flex}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#171e28}
+::-webkit-scrollbar-thumb{background:#2a3444;border-radius:3px}
+.sidebar{width:60px;background:#171e28;border-right:1px solid rgba(115,130,153,0.15);display:flex;flex-direction:column;align-items:center;padding:12px 0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar-logo{width:36px;height:36px;background:linear-gradient(135deg,#00b6f9,#0090d9);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-weight:700;color:#fff;font-size:14px}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px;width:100%;align-items:center}
+.sidebar-nav a{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#5c6a7a;text-decoration:none;font-size:18px;transition:all .2s}
+.sidebar-nav a:hover{background:rgba(0,182,249,0.1);color:#00b6f9}
+.sidebar-nav a.active{background:rgba(0,182,249,0.15);color:#00b6f9}
+.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px;align-items:center}
+.main{margin-left:60px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{height:56px;background:#171e28;border-bottom:1px solid rgba(115,130,153,0.15);display:flex;align-items:center;padding:0 24px;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-title{font-size:15px;font-weight:600}
+.balance-display{display:flex;align-items:center;gap:8px;background:rgba(0,182,249,0.1);padding:6px 14px;border-radius:8px}
+.balance-label{font-size:11px;color:#5c6a7a}
+.balance-value{font-size:15px;font-weight:700;color:#00b6f9}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{background:none;border:none;color:#5c6a7a;font-size:18px;cursor:pointer;padding:6px;border-radius:6px;transition:all .2s}
+.topbar-btn:hover{color:#d1d4dc;background:rgba(255,255,255,0.05)}
+.content{flex:1;padding:24px;max-width:800px;width:100%}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-header p{color:#5c6a7a;font-size:13px}
+
+.section{background:#171e28;border:1px solid rgba(115,130,153,0.15);border-radius:12px;padding:24px;margin-bottom:20px}
+.section-title{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title i{color:#00b6f9}
+
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(115,130,153,0.1)}
+.setting-row:last-child{border-bottom:none}
+.setting-info h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.setting-info p{font-size:12px;color:#5c6a7a}
+.toggle{width:44px;height:24px;background:#2a3444;border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.active{background:#00b6f9}
+.toggle::after{content:'';width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .2s}
+.toggle.active::after{transform:translateX(20px)}
+
+.setting-select{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(115,130,153,0.1)}
+.setting-select:last-child{border-bottom:none}
+.setting-select label{font-size:14px;font-weight:600}
+.select-group{display:flex;flex-direction:column;gap:4px}
+.select-group label{font-size:12px;color:#5c6a7a}
+select{background:#1b222f;border:1px solid rgba(115,130,153,0.15);border-radius:8px;padding:8px 14px;color:#d1d4dc;font-size:13px;font-family:inherit;outline:none;cursor:pointer;-webkit-appearance:none;min-width:160px}
+select:focus{border-color:#00b6f9}
+select option{background:#171e28;color:#d1d4dc}
+
+.color-options{display:flex;gap:10px;align-items:center}
+.color-opt{width:32px;height:32px;border-radius:6px;border:2px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.color-opt.active{border-color:#fff}
+.color-opt i{font-size:12px;color:#fff}
+
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-primary{background:#00b6f9;color:#fff}
+.btn-primary:hover{background:#0090d9}
+.btn-secondary{background:rgba(0,182,249,0.1);color:#00b6f9;border:1px solid rgba(0,182,249,0.2)}
+.btn-secondary:hover{background:rgba(0,182,249,0.2)}
+.btn-danger{background:rgba(255,62,31,0.15);color:#ff3e1f;border:1px solid rgba(255,62,31,0.2)}
+.btn-danger:hover{background:rgba(255,62,31,0.25)}
+.btn-logout{width:100%;padding:14px;background:rgba(255,62,31,0.1);color:#ff3e1f;border:1px solid rgba(255,62,31,0.2);border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-logout:hover{background:rgba(255,62,31,0.2)}
+.btn-row{display:flex;gap:12px;margin-top:16px;justify-content:flex-end}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:200}
+.modal-overlay.show{display:flex}
+.modal{background:#171e28;border:1px solid rgba(115,130,153,0.15);border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:8px}
+.modal p{color:#5c6a7a;font-size:13px;margin-bottom:20px}
+.modal-btns{display:flex;gap:12px;justify-content:center}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#171e28;border:1px solid rgba(69,183,52,0.3);color:#45b734;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:1000;display:none;animation:slideUp .3s}
+.toast.show{display:flex;align-items:center;gap:8px}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.preview-chips{display:flex;gap:8px;margin-top:8px}
+.chip{padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600}
+.chip.bullish{background:rgba(69,183,52,0.15);color:#45b734}
+.chip.bearish{background:rgba(255,62,31,0.15);color:#ff3e1f}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">PO</div>
+  <nav class="sidebar-nav">
+    <a href="/pages/trading/" title="Trading"><i class="fas fa-chart-line"></i></a>
+    <a href="/pages/cabinet/profile/" title="Profile"><i class="fas fa-user"></i></a>
+    <a href="/pages/cabinet/deposit/" title="Deposit"><i class="fas fa-wallet"></i></a>
+    <a href="/pages/cabinet/withdrawal/" title="Withdrawal"><i class="fas fa-arrow-up"></i></a>
+    <a href="/pages/cabinet/history/" title="History"><i class="fas fa-history"></i></a>
+    <a href="/pages/cabinet/achievements/" title="Achievements"><i class="fas fa-trophy"></i></a>
+    <a href="/pages/cabinet/settings/" title="Settings" class="active"><i class="fas fa-cog"></i></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a href="/pages/cabinet/settings/" title="Settings"><i class="fas fa-cog"></i></a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Settings</span>
+    </div>
+    <div class="topbar-right">
+      <div class="balance-display">
+        <span class="balance-label">Balance</span>
+        <span class="balance-value" id="topBalance">$10,000.00</span>
+      </div>
+      <button class="topbar-btn" title="Notifications"><i class="fas fa-bell"></i></button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="page-header">
+      <h1>Settings</h1>
+      <p>Customize your trading experience</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-palette"></i> Appearance</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Theme</h4>
+          <p>Choose your preferred color theme</p>
+        </div>
+        <select id="themeSelect" onchange="saveSetting('theme',this.value);applyTheme(this.value)">
+          <option value="dark-blue" selected>Dark Blue</option>
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Compact Mode</h4>
+          <p>Reduce spacing for a denser layout</p>
+        </div>
+        <div class="toggle" id="toggleCompact" onclick="toggleSetting(this,'compactMode')"></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Hide Balance</h4>
+          <p>Hide your account balance on screen</p>
+        </div>
+        <div class="toggle" id="toggleHideBal" onclick="toggleSetting(this,'hideBalance')"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-globe"></i> Language & Region</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Language</h4>
+          <p>Select your preferred language</p>
+        </div>
+        <select id="langSelect" onchange="saveSetting('language',this.value)">
+          <option value="en" selected>English</option>
+          <option value="es">Espanol</option>
+          <option value="pt">Portugues</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Francais</option>
+          <option value="ar">Arabic</option>
+          <option value="hi">Hindi</option>
+          <option value="zh">Chinese</option>
+          <option value="ja">Japanese</option>
+          <option value="ko">Korean</option>
+          <option value="ru">Russian</option>
+          <option value="tr">Turkish</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-volume-high"></i> Sound & Notifications</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Sound Effects</h4>
+          <p>Play sounds for trades and notifications</p>
+        </div>
+        <div class="toggle active" id="toggleSound" onclick="toggleSetting(this,'soundEffects')"></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Trade Notifications</h4>
+          <p>Receive notifications for trade results</p>
+        </div>
+        <div class="toggle active" id="toggleNotif" onclick="toggleSetting(this,'notifications')"></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Price Alerts</h4>
+          <p>Get alerts for significant price movements</p>
+        </div>
+        <div class="toggle" id="toggleAlerts" onclick="toggleSetting(this,'priceAlerts')"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-chart-candlestick"></i> Chart Settings</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Chart Type</h4>
+          <p>Default chart type for new charts</p>
+        </div>
+        <select id="chartType" onchange="saveSetting('chartType',this.value)">
+          <option value="candle" selected>Candlestick</option>
+          <option value="line">Line</option>
+          <option value="area">Area</option>
+          <option value="bars">OHLC Bars</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Default Timeframe</h4>
+          <p>Default candle timeframe</p>
+        </div>
+        <select id="timeframe" onchange="saveSetting('timeframe',this.value)">
+          <option value="5">5 seconds</option>
+          <option value="15">15 seconds</option>
+          <option value="30">30 seconds</option>
+          <option value="60" selected>1 minute</option>
+          <option value="300">5 minutes</option>
+          <option value="900">15 minutes</option>
+          <option value="3600">1 hour</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Bull Candle Color</h4>
+          <p>Color for bullish candles</p>
+        </div>
+        <div class="color-options">
+          <div class="color-opt active" style="background:#45b734" onclick="setBullColor(this,'#45b734')"><i class="fas fa-check"></i></div>
+          <div class="color-opt" style="background:#26a17b" onclick="setBullColor(this,'#26a17b')"><i class="fas fa-check"></i></div>
+          <div class="color-opt" style="background:#fff" onclick="setBullColor(this,'#ffffff')"><i class="fas fa-check" style="color:#333"></i></div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Bear Candle Color</h4>
+          <p>Color for bearish candles</p>
+        </div>
+        <div class="color-options">
+          <div class="color-opt active" style="background:#ff3e1f" onclick="setBearColor(this,'#ff3e1f')"><i class="fas fa-check"></i></div>
+          <div class="color-opt" style="background:#e74c3c" onclick="setBearColor(this,'#e74c3c')"><i class="fas fa-check"></i></div>
+          <div class="color-opt" style="background:#ff6b35" onclick="setBearColor(this,'#ff6b35')"><i class="fas fa-check"></i></div>
+        </div>
+      </div>
+      <div class="preview-chips">
+        <span class="chip bullish">Bullish Preview</span>
+        <span class="chip bearish">Bearish Preview</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-database"></i> Data Management</div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Export Trading Data</h4>
+          <p>Download your trade history as CSV</p>
+        </div>
+        <button class="btn btn-secondary" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Clear Trade History</h4>
+          <p>Permanently delete all trade records</p>
+        </div>
+        <button class="btn btn-danger" onclick="confirmClear()"><i class="fas fa-trash-alt"></i> Clear</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" style="color:#ff3e1f"><i class="fas fa-right-from-bracket" style="color:#ff3e1f"></i> Account</div>
+      <button class="btn-logout" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="clearModal">
+  <div class="modal">
+    <h2>Clear Trade History?</h2>
+    <p>This will permanently delete all your trade records. This action cannot be undone.</p>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="document.getElementById('clearModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-danger" onclick="clearHistory()">Clear History</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">Setting saved</span></div>
+
+<script src="/js/modules/api.js"></script>
+<script>
+if (!localStorage.getItem('po_logged_in')) {
+  window.location.href = '/pages/login/';
+}
+
+const user = JSON.parse(localStorage.getItem('po_user') || '{"balance":10000}');
+let settings = JSON.parse(localStorage.getItem('po_settings') || '{}');
+
+function formatMoney(n) {
+  return '$' + Number(n || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function init() {
+  document.getElementById('topBalance').textContent = formatMoney(user.balance);
+  loadSettings();
+}
+
+function loadSettings() {
+  if (settings.theme) { document.getElementById('themeSelect').value = settings.theme; applyTheme(settings.theme); }
+  if (settings.language) document.getElementById('langSelect').value = settings.language;
+  if (settings.chartType) document.getElementById('chartType').value = settings.chartType;
+  if (settings.timeframe) document.getElementById('timeframe').value = settings.timeframe;
+  if (settings.compactMode) document.getElementById('toggleCompact').classList.add('active');
+  if (settings.hideBalance) document.getElementById('toggleHideBal').classList.add('active');
+  if (settings.soundEffects === false) document.getElementById('toggleSound').classList.remove('active');
+  if (settings.notifications === false) document.getElementById('toggleNotif').classList.remove('active');
+  if (settings.priceAlerts) document.getElementById('toggleAlerts').classList.add('active');
+}
+
+function saveSetting(key, val) {
+  settings[key] = val;
+  localStorage.setItem('po_settings', JSON.stringify(settings));
+  showToast('Setting saved');
+}
+
+function toggleSetting(el, key) {
+  el.classList.toggle('active');
+  settings[key] = el.classList.contains('active');
+  localStorage.setItem('po_settings', JSON.stringify(settings));
+  showToast('Setting saved');
+}
+
+function applyTheme(theme) {
+  if (theme === 'light') {
+    document.body.style.background = '#f0f2f5';
+    document.body.style.color = '#333';
+  } else {
+    document.body.style.background = '#1b222f';
+    document.body.style.color = '#d1d4dc';
+  }
+}
+
+function setBullColor(el, color) {
+  el.closest('.color-options').querySelectorAll('.color-opt').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  settings.bullColor = color;
+  localStorage.setItem('po_settings', JSON.stringify(settings));
+  showToast('Bull candle color updated');
+}
+
+function setBearColor(el, color) {
+  el.closest('.color-options').querySelectorAll('.color-opt').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  settings.bearColor = color;
+  localStorage.setItem('po_settings', JSON.stringify(settings));
+  showToast('Bear candle color updated');
+}
+
+function exportData() {
+  const trades = localStorage.getItem('po_trades') || '[]';
+  const blob = new Blob([trades], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'pocket_option_trades_' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported successfully');
+}
+
+function confirmClear() {
+  document.getElementById('clearModal').classList.add('show');
+}
+
+function clearHistory() {
+  localStorage.removeItem('po_trades');
+  document.getElementById('clearModal').classList.remove('show');
+  showToast('Trade history cleared');
+}
+
+function doLogout() {
+  localStorage.removeItem('po_logged_in');
+  window.location.href = '/pages/login/';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+init();
+</script>
+</body>
+</html>

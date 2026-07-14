@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trade History - Pocket Option</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;background:#1b222f;color:#d1d4dc;min-height:100vh;display:flex}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#171e28}
+::-webkit-scrollbar-thumb{background:#2a3444;border-radius:3px}
+.sidebar{width:60px;background:#171e28;border-right:1px solid rgba(115,130,153,0.15);display:flex;flex-direction:column;align-items:center;padding:12px 0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar-logo{width:36px;height:36px;background:linear-gradient(135deg,#00b6f9,#0090d9);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-weight:700;color:#fff;font-size:14px}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px;width:100%;align-items:center}
+.sidebar-nav a{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#5c6a7a;text-decoration:none;font-size:18px;transition:all .2s}
+.sidebar-nav a:hover{background:rgba(0,182,249,0.1);color:#00b6f9}
+.sidebar-nav a.active{background:rgba(0,182,249,0.15);color:#00b6f9}
+.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px;align-items:center}
+.main{margin-left:60px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{height:56px;background:#171e28;border-bottom:1px solid rgba(115,130,153,0.15);display:flex;align-items:center;padding:0 24px;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-title{font-size:15px;font-weight:600}
+.balance-display{display:flex;align-items:center;gap:8px;background:rgba(0,182,249,0.1);padding:6px 14px;border-radius:8px}
+.balance-label{font-size:11px;color:#5c6a7a}
+.balance-value{font-size:15px;font-weight:700;color:#00b6f9}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{background:none;border:none;color:#5c6a7a;font-size:18px;cursor:pointer;padding:6px;border-radius:6px;transition:all .2s}
+.topbar-btn:hover{color:#d1d4dc;background:rgba(255,255,255,0.05)}
+.content{flex:1;padding:24px;max-width:1100px;width:100%}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-header p{color:#5c6a7a;font-size:13px}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#171e28;border:1px solid rgba(115,130,153,0.15);border-radius:10px;padding:16px}
+.stat-label{font-size:11px;color:#5c6a7a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:700}
+.stat-value.blue{color:#00b6f9}
+.stat-value.green{color:#45b734}
+.stat-value.red{color:#ff3e1f}
+
+.section{background:#171e28;border:1px solid rgba(115,130,153,0.15);border-radius:12px;padding:20px;margin-bottom:20px}
+.section-title{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title i{color:#00b6f9}
+
+.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-group label{font-size:11px;color:#5c6a7a;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.filter-group input,.filter-group select{background:#1b222f;border:1px solid rgba(115,130,153,0.15);border-radius:6px;padding:8px 12px;color:#d1d4dc;font-size:13px;font-family:inherit;outline:none}
+.filter-group input:focus,.filter-group select:focus{border-color:#00b6f9}
+.filter-group select{cursor:pointer;-webkit-appearance:none}
+.filter-group select option{background:#171e28}
+
+.table-wrap{overflow-x:auto;margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:10px 12px;color:#5c6a7a;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid rgba(115,130,153,0.15);white-space:nowrap}
+tbody td{padding:10px 12px;border-bottom:1px solid rgba(115,130,153,0.08);white-space:nowrap}
+tbody tr:hover{background:rgba(0,182,249,0.03)}
+.direction{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;display:inline-block}
+.direction.call{background:rgba(69,183,52,0.15);color:#45b734}
+.direction.put{background:rgba(255,62,31,0.15);color:#ff3e1f}
+.result-win{color:#45b734;font-weight:700}
+.result-loss{color:#ff3e1f;font-weight:700}
+.result-pending{color:#ffbb00;font-weight:700}
+
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px}
+.page-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(115,130,153,0.15);border-radius:6px;background:#1b222f;color:#5c6a7a;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s}
+.page-btn:hover{border-color:#00b6f9;color:#00b6f9}
+.page-btn.active{background:#00b6f9;border-color:#00b6f9;color:#fff}
+.page-btn:disabled{opacity:0.3;cursor:not-allowed}
+.page-info{font-size:12px;color:#5c6a7a;margin:0 8px}
+
+.empty-state{text-align:center;padding:40px;color:#5c6a7a;font-size:13px}
+.empty-state i{font-size:36px;margin-bottom:12px;display:block;color:#2a3444}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">PO</div>
+  <nav class="sidebar-nav">
+    <a href="/pages/trading/" title="Trading"><i class="fas fa-chart-line"></i></a>
+    <a href="/pages/cabinet/profile/" title="Profile"><i class="fas fa-user"></i></a>
+    <a href="/pages/cabinet/deposit/" title="Deposit"><i class="fas fa-wallet"></i></a>
+    <a href="/pages/cabinet/withdrawal/" title="Withdrawal"><i class="fas fa-arrow-up"></i></a>
+    <a href="/pages/cabinet/history/" title="History" class="active"><i class="fas fa-history"></i></a>
+    <a href="/pages/cabinet/achievements/" title="Achievements"><i class="fas fa-trophy"></i></a>
+    <a href="/pages/cabinet/settings/" title="Settings"><i class="fas fa-cog"></i></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a href="/pages/cabinet/settings/" title="Settings"><i class="fas fa-cog"></i></a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Trade History</span>
+    </div>
+    <div class="topbar-right">
+      <div class="balance-display">
+        <span class="balance-label">Balance</span>
+        <span class="balance-value" id="topBalance">$10,000.00</span>
+      </div>
+      <button class="topbar-btn" title="Notifications"><i class="fas fa-bell"></i></button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="page-header">
+      <h1>Trade History</h1>
+      <p>Review all your past trades and transactions</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Trades</div>
+        <div class="stat-value blue" id="totalTrades">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Win Rate</div>
+        <div class="stat-value green" id="winRate">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Profit</div>
+        <div class="stat-value green" id="totalProfit">$0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Loss</div>
+        <div class="stat-value red" id="totalLoss">$0.00</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-filter"></i> Filters</div>
+      <div class="filters">
+        <div class="filter-group">
+          <label>From</label>
+          <input type="date" id="filterFrom">
+        </div>
+        <div class="filter-group">
+          <label>To</label>
+          <input type="date" id="filterTo">
+        </div>
+        <div class="filter-group">
+          <label>Asset</label>
+          <select id="filterAsset">
+            <option value="">All Assets</option>
+            <option value="EUR/USD">EUR/USD</option>
+            <option value="GBP/USD">GBP/USD</option>
+            <option value="USD/JPY">USD/JPY</option>
+            <option value="AUD/USD">AUD/USD</option>
+            <option value="USD/CAD">USD/CAD</option>
+            <option value="BTC/USD">BTC/USD</option>
+            <option value="ETH/USD">ETH/USD</option>
+            <option value="AAPL">AAPL</option>
+            <option value="GOOGL">GOOGL</option>
+            <option value="TSLA">TSLA</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Status</label>
+          <select id="filterStatus">
+            <option value="">All</option>
+            <option value="win">Wins</option>
+            <option value="loss">Losses</option>
+            <option value="pending">Pending</option>
+            <option value="deposit">Deposits</option>
+            <option value="withdrawal">Withdrawals</option>
+          </select>
+        </div>
+        <button class="filter-group" style="background:#00b6f9;border:none;color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit" onclick="applyFilters()">Apply</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Asset</th>
+              <th>Direction</th>
+              <th>Amount</th>
+              <th>Entry</th>
+              <th>Close</th>
+              <th>Payout</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody id="tradeTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/modules/api.js"></script>
+<script>
+if (!localStorage.getItem('po_logged_in')) {
+  window.location.href = '/pages/login/';
+}
+
+const user = JSON.parse(localStorage.getItem('po_user') || '{"balance":10000}');
+const PER_PAGE = 15;
+let currentPage = 1;
+let filteredTrades = [];
+
+function formatMoney(n) {
+  return '$' + Number(n || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function init() {
+  document.getElementById('topBalance').textContent = formatMoney(user.balance);
+  loadTrades();
+}
+
+function loadTrades() {
+  const all = JSON.parse(localStorage.getItem('po_trades') || '[]');
+  const trades = all.filter(t => t.type !== 'deposit' && t.type !== 'withdrawal');
+  const deposits = all.filter(t => t.type === 'deposit');
+  const withdrawals = all.filter(t => t.type === 'withdrawal');
+  filteredTrades = [...trades, ...deposits, ...withdrawals];
+
+  let wins = trades.filter(t => t.status === 'win');
+  let losses = trades.filter(t => t.status === 'loss');
+  let totalP = wins.reduce((s, t) => s + (t.profit || 0), 0);
+  let totalL = losses.reduce((s, t) => s + Math.abs(t.profit || 0), 0);
+  let wr = trades.length > 0 ? Math.round((wins.length / trades.length) * 100) : 0;
+
+  document.getElementById('totalTrades').textContent = trades.length;
+  document.getElementById('winRate').textContent = wr + '%';
+  document.getElementById('totalProfit').textContent = formatMoney(totalP);
+  document.getElementById('totalLoss').textContent = formatMoney(totalL);
+
+  applyFilters();
+}
+
+function applyFilters() {
+  const from = document.getElementById('filterFrom').value;
+  const to = document.getElementById('filterTo').value;
+  const asset = document.getElementById('filterAsset').value;
+  const status = document.getElementById('filterStatus').value;
+
+  filteredTrades = filteredTrades.filter(t => {
+    if (from && t.date && t.date < from) return false;
+    if (to && t.date && t.date > to + 'T23:59:59') return false;
+    if (asset && t.asset !== asset) return false;
+    if (status === 'win' && t.status !== 'win') return false;
+    if (status === 'loss' && t.status !== 'loss') return false;
+    if (status === 'pending' && t.status !== 'pending') return false;
+    if (status === 'deposit' && t.type !== 'deposit') return false;
+    if (status === 'withdrawal' && t.type !== 'withdrawal') return false;
+    return true;
+  });
+
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tradeTableBody');
+  const total = filteredTrades.length;
+  const pages = Math.ceil(total / PER_PAGE);
+  const start = (currentPage - 1) * PER_PAGE;
+  const slice = filteredTrades.slice(start, start + PER_PAGE);
+
+  if (slice.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fas fa-inbox"></i>No trades found</div></td></tr>';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = slice.map(t => {
+    const d = new Date(t.date);
+    const dateStr = d.toLocaleDateString('en-US', {month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+    const isTrade = t.type !== 'deposit' && t.type !== 'withdrawal';
+    let resultClass = '';
+    let resultText = '';
+    if (t.type === 'deposit') {
+      resultClass = 'result-win';
+      resultText = '+' + formatMoney(t.total || t.amount);
+    } else if (t.type === 'withdrawal') {
+      resultClass = 'result-loss';
+      resultText = '-' + formatMoney(t.amount);
+    } else if (t.status === 'win') {
+      resultClass = 'result-win';
+      resultText = '+' + formatMoney(t.profit);
+    } else if (t.status === 'loss') {
+      resultClass = 'result-loss';
+      resultText = '-' + formatMoney(Math.abs(t.profit || t.amount));
+    } else {
+      resultClass = 'result-pending';
+      resultText = 'Pending';
+    }
+    const typeLabel = t.type === 'deposit' ? 'Deposit' : t.type === 'withdrawal' ? 'Withdrawal' : 'Trade';
+    return '<tr><td>' + dateStr + '</td><td>' + typeLabel + '</td><td>' + (t.asset || '-') + '</td><td>' + (isTrade ? '<span class="direction ' + (t.direction || 'call') + '">' + (t.direction || 'Call').toUpperCase() + '</span>' : '-') + '</td><td>' + (isTrade || t.type === 'withdrawal' ? formatMoney(t.amount) : '-') + '</td><td>' + (isTrade && t.entry ? t.entry.toFixed(5) : '-') + '</td><td>' + (isTrade && t.close ? t.close.toFixed(5) : '-') + '</td><td>' + (isTrade ? formatMoney(t.payout) : '-') + '</td><td class="' + resultClass + '">' + resultText + '</td></tr>';
+  }).join('');
+
+  let pagHtml = '<button class="page-btn" onclick="goPage(' + (currentPage - 1) + ')" ' + (currentPage <= 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
+  for (let i = 1; i <= pages; i++) {
+    if (pages > 7 && i > 3 && i < pages - 2 && Math.abs(i - currentPage) > 1) {
+      if (i === 4 || i === pages - 3) pagHtml += '<span class="page-info">...</span>';
+      continue;
+    }
+    pagHtml += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+  }
+  pagHtml += '<button class="page-btn" onclick="goPage(' + (currentPage + 1) + ')" ' + (currentPage >= pages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
+  pagHtml += '<span class="page-info">' + total + ' records</span>';
+  document.getElementById('pagination').innerHTML = pagHtml;
+}
+
+function goPage(p) {
+  const pages = Math.ceil(filteredTrades.length / PER_PAGE);
+  if (p < 1 || p > pages) return;
+  currentPage = p;
+  renderTable();
+}
+
+init();
+</script>
+</body>
+</html>

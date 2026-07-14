@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Withdrawal - Pocket Option</title>
+<link href="https://fonts.googleapis.com/css2?family=Open Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;background:#1b222f;color:#d1d4dc;min-height:100vh;display:flex}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#171e28}
+::-webkit-scrollbar-thumb{background:#2a3444;border-radius:3px}
+.sidebar{width:60px;background:#171e28;border-right:1px solid rgba(115,130,153,0.15);display:flex;flex-direction:column;align-items:center;padding:12px 0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar-logo{width:36px;height:36px;background:linear-gradient(135deg,#00b6f9,#0090d9);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-weight:700;color:#fff;font-size:14px}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px;width:100%;align-items:center}
+.sidebar-nav a{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#5c6a7a;text-decoration:none;font-size:18px;transition:all .2s}
+.sidebar-nav a:hover{background:rgba(0,182,249,0.1);color:#00b6f9}
+.sidebar-nav a.active{background:rgba(0,182,249,0.15);color:#00b6f9}
+.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px;align-items:center}
+.main{margin-left:60px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{height:56px;background:#171e28;border-bottom:1px solid rgba(115,130,153,0.15);display:flex;align-items:center;padding:0 24px;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-title{font-size:15px;font-weight:600}
+.balance-display{display:flex;align-items:center;gap:8px;background:rgba(0,182,249,0.1);padding:6px 14px;border-radius:8px}
+.balance-label{font-size:11px;color:#5c6a7a}
+.balance-value{font-size:15px;font-weight:700;color:#00b6f9}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{background:none;border:none;color:#5c6a7a;font-size:18px;cursor:pointer;padding:6px;border-radius:6px;transition:all .2s}
+.topbar-btn:hover{color:#d1d4dc;background:rgba(255,255,255,0.05)}
+.content{flex:1;padding:24px;max-width:900px;width:100%}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-header p{color:#5c6a7a;font-size:13px}
+.section{background:#171e28;border:1px solid rgba(115,130,153,0.15);border-radius:12px;padding:24px;margin-bottom:20px}
+.section-title{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title i{color:#00b6f9}
+
+.methods-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.method-card{background:#1b222f;border:2px solid rgba(115,130,153,0.15);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.method-card:hover{border-color:rgba(0,182,249,0.3)}
+.method-card.selected{border-color:#00b6f9;background:rgba(0,182,249,0.05)}
+.method-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.method-icon.visa{background:rgba(26,110,199,0.15);color:#1a6ec7}
+.method-icon.btc{background:rgba(247,147,26,0.15);color:#f7931a}
+.method-icon.eth{background:rgba(98,126,234,0.15);color:#627eea}
+.method-icon.usdt{background:rgba(38,161,123,0.15);color:#26a17b}
+.method-icon.bank{background:rgba(0,182,249,0.15);color:#00b6f9}
+.method-name{font-size:13px;font-weight:600}
+.method-desc{font-size:11px;color:#5c6a7a}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:12px;color:#5c6a7a;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.form-group input,.form-group select{background:#1b222f;border:1px solid rgba(115,130,153,0.15);border-radius:8px;padding:10px 14px;color:#d1d4dc;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{border-color:#00b6f9}
+.form-group select{cursor:pointer;-webkit-appearance:none}
+.form-group select option{background:#171e28;color:#d1d4dc}
+
+.amount-input-wrap{display:flex;align-items:center;background:#1b222f;border:1px solid rgba(115,130,153,0.15);border-radius:8px;overflow:hidden}
+.amount-input-wrap:focus-within{border-color:#00b6f9}
+.amount-prefix{padding:12px 14px;font-size:18px;font-weight:700;color:#5c6a7a;border-right:1px solid rgba(115,130,153,0.15)}
+.amount-input{flex:1;background:none;border:none;padding:12px 14px;color:#d1d4dc;font-size:18px;font-weight:600;font-family:inherit;outline:none}
+.quick-amounts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.quick-btn{padding:6px 14px;background:#1b222f;border:1px solid rgba(115,130,153,0.15);border-radius:6px;color:#d1d4dc;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.quick-btn:hover{border-color:#00b6f9;color:#00b6f9}
+.quick-btn.active{background:rgba(0,182,249,0.15);border-color:#00b6f9;color:#00b6f9}
+.amount-info{font-size:11px;color:#5c6a7a;margin-top:6px}
+
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,#00b6f9,#0090d9);color:#fff;width:100%;padding:14px;font-size:16px;border-radius:10px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,182,249,0.3)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-row{display:flex;gap:12px;margin-top:20px}
+
+.pending-list{display:flex;flex-direction:column;gap:10px}
+.pending-item{display:flex;align-items:center;justify-content:space-between;padding:14px;background:#1b222f;border-radius:8px;border:1px solid rgba(115,130,153,0.15)}
+.pending-left{display:flex;align-items:center;gap:12px}
+.pending-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(0,182,249,0.1);color:#00b6f9}
+.pending-info h4{font-size:13px;font-weight:600}
+.pending-info p{font-size:11px;color:#5c6a7a}
+.pending-right{text-align:right}
+.pending-amount{font-size:14px;font-weight:700}
+.pending-status{font-size:11px;padding:3px 8px;border-radius:4px;margin-top:4px;display:inline-block}
+.pending-status.processing{background:rgba(0,182,249,0.15);color:#00b6f9}
+.pending-status.pending{background:rgba(255,187,0,0.15);color:#ffbb00}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#171e28;border:1px solid rgba(69,183,52,0.3);color:#45b734;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:1000;display:none;animation:slideUp .3s}
+.toast.show{display:flex;align-items:center;gap:8px}
+.toast.error{border-color:rgba(255,62,31,0.3);color:#ff3e1f}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.empty-state{text-align:center;padding:32px;color:#5c6a7a;font-size:13px}
+.empty-state i{font-size:32px;margin-bottom:12px;display:block;color:#2a3444}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">PO</div>
+  <nav class="sidebar-nav">
+    <a href="/pages/trading/" title="Trading"><i class="fas fa-chart-line"></i></a>
+    <a href="/pages/cabinet/profile/" title="Profile"><i class="fas fa-user"></i></a>
+    <a href="/pages/cabinet/deposit/" title="Deposit"><i class="fas fa-wallet"></i></a>
+    <a href="/pages/cabinet/withdrawal/" title="Withdrawal" class="active"><i class="fas fa-arrow-up"></i></a>
+    <a href="/pages/cabinet/history/" title="History"><i class="fas fa-history"></i></a>
+    <a href="/pages/cabinet/achievements/" title="Achievements"><i class="fas fa-trophy"></i></a>
+    <a href="/pages/cabinet/settings/" title="Settings"><i class="fas fa-cog"></i></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a href="/pages/cabinet/settings/" title="Settings"><i class="fas fa-cog"></i></a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Withdrawal</span>
+    </div>
+    <div class="topbar-right">
+      <div class="balance-display">
+        <span class="balance-label">Balance</span>
+        <span class="balance-value" id="topBalance">$10,000.00</span>
+      </div>
+      <button class="topbar-btn" title="Notifications"><i class="fas fa-bell"></i></button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="page-header">
+      <h1>Withdraw Funds</h1>
+      <p>Withdraw your earnings to your preferred payment method</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-credit-card"></i> Withdrawal Method</div>
+      <div class="methods-grid">
+        <div class="method-card selected" data-method="visa" onclick="selectMethod(this)">
+          <div class="method-icon visa"><i class="fab fa-cc-visa"></i></div>
+          <div class="method-name">Visa / Mastercard</div>
+          <div class="method-desc">1-3 business days</div>
+        </div>
+        <div class="method-card" data-method="btc" onclick="selectMethod(this)">
+          <div class="method-icon btc"><i class="fab fa-bitcoin"></i></div>
+          <div class="method-name">Bitcoin</div>
+          <div class="method-desc">10-30 min</div>
+        </div>
+        <div class="method-card" data-method="eth" onclick="selectMethod(this)">
+          <div class="method-icon eth"><i class="fab fa-ethereum"></i></div>
+          <div class="method-name">Ethereum</div>
+          <div class="method-desc">5-15 min</div>
+        </div>
+        <div class="method-card" data-method="usdt_trc20" onclick="selectMethod(this)">
+          <div class="method-icon usdt"><i class="fas fa-dollar-sign"></i></div>
+          <div class="method-name">USDT (TRC20)</div>
+          <div class="method-desc">Instant</div>
+        </div>
+        <div class="method-card" data-method="usdt_bep20" onclick="selectMethod(this)">
+          <div class="method-icon usdt"><i class="fas fa-dollar-sign"></i></div>
+          <div class="method-name">USDT (BEP20)</div>
+          <div class="method-desc">Instant</div>
+        </div>
+        <div class="method-card" data-method="bank" onclick="selectMethod(this)">
+          <div class="method-icon bank"><i class="fas fa-university"></i></div>
+          <div class="method-name">Bank Transfer</div>
+          <div class="method-desc">3-5 business days</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-arrow-up"></i> Withdrawal Details</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Amount</label>
+          <div class="amount-input-wrap">
+            <span class="amount-prefix">$</span>
+            <input type="number" class="amount-input" id="withdrawAmount" value="" min="1" max="50000" step="0.01" oninput="updateWithdraw()">
+          </div>
+          <div class="quick-amounts">
+            <button class="quick-btn" onclick="setWAmount(50)">$50</button>
+            <button class="quick-btn" onclick="setWAmount(100)">$100</button>
+            <button class="quick-btn" onclick="setWAmount(500)">$500</button>
+            <button class="quick-btn" onclick="setWAmount(1000)">$1,000</button>
+            <button class="quick-btn" onclick="setWAmount(5000)">$5,000</button>
+          </div>
+          <div class="amount-info">Available: <span id="availBal" style="color:#00b6f9">$10,000.00</span></div>
+        </div>
+        <div class="form-group" id="walletGroup">
+          <label>Wallet Address / Account Number</label>
+          <input type="text" id="walletAddress" placeholder="Enter your wallet address or account number">
+        </div>
+        <div class="form-group full">
+          <label>Full Name (as on account)</label>
+          <input type="text" id="fullName" placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="withdrawEmail" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label>Phone (optional)</label>
+          <input type="tel" id="withdrawPhone" placeholder="+1 (555) 000-0000">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="withdrawBtn" onclick="makeWithdrawal()" disabled>
+        <i class="fas fa-lock"></i>&nbsp; Request Withdrawal
+      </button>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-clock"></i> Pending Withdrawals</div>
+      <div id="pendingList" class="pending-list">
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          No pending withdrawals
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+<script src="/js/modules/api.js"></script>
+<script>
+if (!localStorage.getItem('po_logged_in')) {
+  window.location.href = '/pages/login/';
+}
+
+let user = JSON.parse(localStorage.getItem('po_user') || '{"balance":10000}');
+let selectedMethod = 'visa';
+
+function formatMoney(n) {
+  return '$' + Number(n || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function init() {
+  document.getElementById('topBalance').textContent = formatMoney(user.balance);
+  document.getElementById('availBal').textContent = formatMoney(user.balance);
+  document.getElementById('fullName').value = (user.firstName || '') + ' ' + (user.lastName || '');
+  document.getElementById('withdrawEmail').value = user.email || '';
+  renderPending();
+}
+
+function selectMethod(el) {
+  document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMethod = el.dataset.method;
+}
+
+function setWAmount(val) {
+  document.getElementById('withdrawAmount').value = val;
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateWithdraw();
+}
+
+function updateWithdraw() {
+  const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+  const valid = amt >= 1 && amt <= (user.balance || 0);
+  document.getElementById('withdrawBtn').disabled = !valid;
+  document.getElementById('withdrawBtn').innerHTML = '<i class="fas fa-lock"></i>&nbsp; Request Withdrawal' + (valid ? ' - ' + formatMoney(amt) : '');
+}
+
+function renderPending() {
+  const trades = JSON.parse(localStorage.getItem('po_trades') || '[]');
+  const pending = trades.filter(t => t.type === 'withdrawal' && (t.status === 'pending' || t.status === 'processing'));
+  const el = document.getElementById('pendingList');
+  if (pending.length === 0) {
+    el.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i>No pending withdrawals</div>';
+    return;
+  }
+  el.innerHTML = pending.map(w => {
+    const d = new Date(w.date);
+    const dateStr = d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    return '<div class="pending-item"><div class="pending-left"><div class="pending-icon"><i class="fas fa-arrow-up"></i></div><div class="pending-info"><h4>' + (w.method || 'Visa').toUpperCase() + '</h4><p>' + dateStr + '</p></div></div><div class="pending-right"><div class="pending-amount">' + formatMoney(w.amount) + '</div><div class="pending-status ' + w.status + '">' + w.status.charAt(0).toUpperCase() + w.status.slice(1) + '</div></div></div>';
+  }).join('');
+}
+
+function makeWithdrawal() {
+  const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+  if (amt < 1) { showToast('Please enter a valid amount', true); return; }
+  if (amt > user.balance) { showToast('Insufficient balance', true); return; }
+
+  user.balance -= amt;
+  localStorage.setItem('po_user', JSON.stringify(user));
+
+  const trades = JSON.parse(localStorage.getItem('po_trades') || '[]');
+  trades.unshift({
+    id: 'wd_' + Date.now(),
+    type: 'withdrawal',
+    method: selectedMethod,
+    amount: amt,
+    wallet: document.getElementById('walletAddress').value,
+    name: document.getElementById('fullName').value,
+    email: document.getElementById('withdrawEmail').value,
+    date: new Date().toISOString(),
+    status: 'pending'
+  });
+  localStorage.setItem('po_trades', JSON.stringify(trades));
+
+  document.getElementById('topBalance').textContent = formatMoney(user.balance);
+  document.getElementById('availBal').textContent = formatMoney(user.balance);
+  document.getElementById('withdrawAmount').value = '';
+  document.getElementById('walletAddress').value = '';
+  document.getElementById('withdrawBtn').disabled = true;
+  document.getElementById('withdrawBtn').innerHTML = '<i class="fas fa-lock"></i>&nbsp; Request Withdrawal';
+  renderPending();
+  showToast('Withdrawal request submitted successfully');
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  t.querySelector('i').className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+init();
+</script>
+</body>
+</html>

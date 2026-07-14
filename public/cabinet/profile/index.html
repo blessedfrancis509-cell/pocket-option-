@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile - Pocket Option</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;background:#1b222f;color:#d1d4dc;min-height:100vh;display:flex}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#171e28}
+::-webkit-scrollbar-thumb{background:#2a3444;border-radius:3px}
+
+.sidebar{width:60px;background:#171e28;border-right:1px solid rgba(115,130,153,0.15);display:flex;flex-direction:column;align-items:center;padding:12px 0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar-logo{width:36px;height:36px;background:linear-gradient(135deg,#00b6f9,#0090d9);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-weight:700;color:#fff;font-size:14px}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px;width:100%;align-items:center}
+.sidebar-nav a{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#5c6a7a;text-decoration:none;font-size:18px;transition:all .2s}
+.sidebar-nav a:hover{background:rgba(0,182,249,0.1);color:#00b6f9}
+.sidebar-nav a.active{background:rgba(0,182,249,0.15);color:#00b6f9}
+.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px;align-items:center}
+
+.main{margin-left:60px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{height:56px;background:#171e28;border-bottom:1px solid rgba(115,130,153,0.15);display:flex;align-items:center;padding:0 24px;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-title{font-size:15px;font-weight:600}
+.balance-display{display:flex;align-items:center;gap:8px;background:rgba(0,182,249,0.1);padding:6px 14px;border-radius:8px}
+.balance-label{font-size:11px;color:#5c6a7a}
+.balance-value{font-size:15px;font-weight:700;color:#00b6f9}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{background:none;border:none;color:#5c6a7a;font-size:18px;cursor:pointer;padding:6px;border-radius:6px;transition:all .2s}
+.topbar-btn:hover{color:#d1d4dc;background:rgba(255,255,255,0.05)}
+
+.content{flex:1;padding:24px;max-width:900px;width:100%}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-header p{color:#5c6a7a;font-size:13px}
+
+.section{background:#171e28;border:1px solid rgba(115,130,153,0.15);border-radius:12px;padding:24px;margin-bottom:20px}
+.section-title{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title i{color:#00b6f9}
+
+.profile-header{display:flex;align-items:center;gap:20px;margin-bottom:20px}
+.avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#00b6f9,#0090d9);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0}
+.profile-info h2{font-size:18px;font-weight:600;margin-bottom:4px}
+.profile-info p{color:#5c6a7a;font-size:13px}
+.profile-level{display:inline-flex;align-items:center;gap:6px;background:rgba(0,182,249,0.1);padding:4px 10px;border-radius:6px;font-size:12px;color:#00b6f9;margin-top:6px}
+
+.kyc-status{display:flex;align-items:center;gap:12px;padding:14px;border-radius:8px;margin-bottom:12px}
+.kyc-status.verified{background:rgba(69,183,52,0.1);border:1px solid rgba(69,183,52,0.2)}
+.kyc-status.pending{background:rgba(255,187,0,0.1);border:1px solid rgba(255,187,0,0.2)}
+.kyc-status.unverified{background:rgba(255,62,31,0.1);border:1px solid rgba(255,62,31,0.2)}
+.kyc-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
+.kyc-status.verified .kyc-icon{background:rgba(69,183,52,0.2);color:#45b734}
+.kyc-status.pending .kyc-icon{background:rgba(255,187,0,0.2);color:#ffbb00}
+.kyc-status.unverified .kyc-icon{background:rgba(255,62,31,0.2);color:#ff3e1f}
+.kyc-text h4{font-size:13px;font-weight:600}
+.kyc-text p{font-size:12px;color:#5c6a7a}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:12px;color:#5c6a7a;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.form-group input,.form-group select{background:#1b222f;border:1px solid rgba(115,130,153,0.15);border-radius:8px;padding:10px 14px;color:#d1d4dc;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{border-color:#00b6f9}
+.form-group select{cursor:pointer;-webkit-appearance:none}
+.form-group select option{background:#171e28;color:#d1d4dc}
+
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-primary{background:#00b6f9;color:#fff}
+.btn-primary:hover{background:#0090d9}
+.btn-danger{background:rgba(255,62,31,0.15);color:#ff3e1f;border:1px solid rgba(255,62,31,0.2)}
+.btn-danger:hover{background:rgba(255,62,31,0.25)}
+.btn-row{display:flex;gap:12px;justify-content:flex-end;margin-top:16px}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(115,130,153,0.1)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.toggle-info p{font-size:12px;color:#5c6a7a}
+.toggle{width:44px;height:24px;background:#2a3444;border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.active{background:#00b6f9}
+.toggle::after{content:'';width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .2s}
+.toggle.active::after{transform:translateX(20px)}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#171e28;border:1px solid rgba(69,183,52,0.3);color:#45b734;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:1000;display:none;animation:slideUp .3s}
+.toast.show{display:flex;align-items:center;gap:8px}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">PO</div>
+  <nav class="sidebar-nav">
+    <a href="/pages/trading/" title="Trading"><i class="fas fa-chart-line"></i></a>
+    <a href="/pages/cabinet/profile/" title="Profile" class="active"><i class="fas fa-user"></i></a>
+    <a href="/pages/cabinet/deposit/" title="Deposit"><i class="fas fa-wallet"></i></a>
+    <a href="/pages/cabinet/withdrawal/" title="Withdrawal"><i class="fas fa-arrow-up"></i></a>
+    <a href="/pages/cabinet/history/" title="History"><i class="fas fa-history"></i></a>
+    <a href="/pages/cabinet/achievements/" title="Achievements"><i class="fas fa-trophy"></i></a>
+    <a href="/pages/cabinet/settings/" title="Settings"><i class="fas fa-cog"></i></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a href="/pages/cabinet/settings/" title="Settings" class="sidebar-nav"><i class="fas fa-cog"></i></a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Profile</span>
+    </div>
+    <div class="topbar-right">
+      <div class="balance-display">
+        <span class="balance-label">Balance</span>
+        <span class="balance-value" id="topBalance">$10,000.00</span>
+      </div>
+      <button class="topbar-btn" title="Notifications"><i class="fas fa-bell"></i></button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="page-header">
+      <h1>My Profile</h1>
+      <p>Manage your personal information and account settings</p>
+    </div>
+
+    <div class="section">
+      <div class="profile-header">
+        <div class="avatar" id="avatarInitial">J</div>
+        <div class="profile-info">
+          <h2 id="displayName">John Doe</h2>
+          <p id="displayEmail">john@example.com</p>
+          <div class="profile-level"><i class="fas fa-star"></i> Level <span id="userLevel">1</span> Trader</div>
+        </div>
+      </div>
+
+      <div id="kycStatus" class="kyc-status unverified">
+        <div class="kyc-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="kyc-text">
+          <h4 id="kycTitle">Identity Not Verified</h4>
+          <p id="kycDesc">Complete verification to unlock all features</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-user-edit"></i> Personal Information</div>
+      <form id="profileForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="firstName" placeholder="Enter first name">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="lastName" placeholder="Enter last name">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Enter email address">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="phone" placeholder="+1 (555) 000-0000">
+          </div>
+          <div class="form-group">
+            <label>Country</label>
+            <select id="country">
+              <option value="">Select country</option>
+              <option value="US">United States</option>
+              <option value="GB">United Kingdom</option>
+              <option value="DE">Germany</option>
+              <option value="FR">France</option>
+              <option value="CA">Canada</option>
+              <option value="AU">Australia</option>
+              <option value="JP">Japan</option>
+              <option value="BR">Brazil</option>
+              <option value="IN">India</option>
+              <option value="NG">Nigeria</option>
+              <option value="ZA">South Africa</option>
+              <option value="KR">South Korea</option>
+              <option value="MX">Mexico</option>
+              <option value="IT">Italy</option>
+              <option value="ES">Spain</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" id="dob">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-lock"></i> Change Password</div>
+      <form id="passwordForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="currentPassword" placeholder="Enter current password">
+          </div>
+          <div class="form-group"></div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="newPassword" placeholder="Enter new password">
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm new password">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i class="fas fa-shield-alt"></i> Security</div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Two-Factor Authentication</h4>
+          <p>Add an extra layer of security to your account</p>
+        </div>
+        <div class="toggle" id="toggle2FA" onclick="this.classList.toggle('active')"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Email Notifications</h4>
+          <p>Receive email alerts for account activity</p>
+        </div>
+        <div class="toggle active" id="toggleEmail" onclick="this.classList.toggle('active')"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Login Alerts</h4>
+          <p>Get notified of new sign-ins to your account</p>
+        </div>
+        <div class="toggle active" id="toggleLogin" onclick="this.classList.toggle('active')"></div>
+      </div>
+    </div>
+
+    <div class="section" style="border-color:rgba(255,62,31,0.2)">
+      <div class="section-title" style="color:#ff3e1f"><i class="fas fa-exclamation-triangle" style="color:#ff3e1f"></i> Danger Zone</div>
+      <p style="font-size:13px;color:#5c6a7a;margin-bottom:16px">Permanently delete your account and all associated data. This action cannot be undone.</p>
+      <button class="btn btn-danger" onclick="deleteAccount()"><i class="fas fa-trash-alt"></i> Delete Account</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">Changes saved successfully</span></div>
+
+<script src="/js/modules/api.js"></script>
+<script>
+if (!localStorage.getItem('po_logged_in')) {
+  window.location.href = '/pages/login/';
+}
+
+const user = JSON.parse(localStorage.getItem('po_user') || '{}');
+
+function formatMoney(n) {
+  return '$' + Number(n || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function init() {
+  document.getElementById('topBalance').textContent = formatMoney(user.balance || 10000);
+
+  const firstName = user.firstName || user.name?.split(' ')[0] || 'Trader';
+  const lastName = user.lastName || user.name?.split(' ')[1] || '';
+  const email = user.email || 'trader@pocketoption.com';
+  const country = user.country || '';
+  const phone = user.phone || '';
+  const dob = user.dob || '';
+
+  document.getElementById('firstName').value = firstName;
+  document.getElementById('lastName').value = lastName;
+  document.getElementById('email').value = email;
+  document.getElementById('phone').value = phone;
+  document.getElementById('country').value = country;
+  document.getElementById('dob').value = dob;
+  document.getElementById('displayName').textContent = (firstName + ' ' + lastName).trim();
+  document.getElementById('displayEmail').textContent = email;
+  document.getElementById('avatarInitial').textContent = firstName.charAt(0).toUpperCase();
+  document.getElementById('userLevel').textContent = user.level || 1;
+
+  const kyc = user.kyc || 'unverified';
+  const kycEl = document.getElementById('kycStatus');
+  kycEl.className = 'kyc-status ' + kyc;
+  if (kyc === 'verified') {
+    document.getElementById('kycTitle').textContent = 'Identity Verified';
+    document.getElementById('kycDesc').textContent = 'Your identity has been verified successfully';
+  } else if (kyc === 'pending') {
+    document.getElementById('kycTitle').textContent = 'Verification Pending';
+    document.getElementById('kycDesc').textContent = 'Your documents are being reviewed';
+  }
+
+  if (user.twoFactor) document.getElementById('toggle2FA').classList.add('active');
+  if (user.emailNotifications !== false) document.getElementById('toggleEmail').classList.add('active');
+  if (user.loginAlerts !== false) document.getElementById('toggleLogin').classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  user.firstName = document.getElementById('firstName').value;
+  user.lastName = document.getElementById('lastName').value;
+  user.email = document.getElementById('email').value;
+  user.phone = document.getElementById('phone').value;
+  user.country = document.getElementById('country').value;
+  user.dob = document.getElementById('dob').value;
+  user.twoFactor = document.getElementById('toggle2FA').classList.contains('active');
+  user.emailNotifications = document.getElementById('toggleEmail').classList.contains('active');
+  user.loginAlerts = document.getElementById('toggleLogin').classList.contains('active');
+  user.name = (user.firstName + ' ' + user.lastName).trim();
+  localStorage.setItem('po_user', JSON.stringify(user));
+  document.getElementById('displayName').textContent = user.name;
+  document.getElementById('displayEmail').textContent = user.email;
+  document.getElementById('avatarInitial').textContent = (user.firstName || 'T').charAt(0).toUpperCase();
+  showToast('Profile updated successfully');
+});
+
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const cur = document.getElementById('currentPassword').value;
+  const nw = document.getElementById('newPassword').value;
+  const cf = document.getElementById('confirmPassword').value;
+  if (!cur || !nw || !cf) { showToast('Please fill all password fields'); return; }
+  if (nw !== cf) { showToast('Passwords do not match'); return; }
+  if (nw.length < 6) { showToast('Password must be at least 6 characters'); return; }
+  user.password = nw;
+  localStorage.setItem('po_user', JSON.stringify(user));
+  document.getElementById('currentPassword').value = '';
+  document.getElementById('newPassword').value = '';
+  document.getElementById('confirmPassword').value = '';
+  showToast('Password updated successfully');
+});
+
+function deleteAccount() {
+  if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
+    localStorage.removeItem('po_user');
+    localStorage.removeItem('po_logged_in');
+    localStorage.removeItem('po_trades');
+    window.location.href = '/pages/login/';
+  }
+}
+
+init();
+</script>
+</body>
+</html>

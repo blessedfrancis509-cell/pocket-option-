@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html class="theme-dark-blue" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quick Trading Real Account - Pocket Option</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#1F1F23">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/pocketoption/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="/plugins/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/vendors/fonts.css">
+    <link rel="stylesheet" href="/css/mobile.css">
+    <link rel="stylesheet" href="/css/desktop-theme-dark-blue.css">
+    <link rel="stylesheet" href="/css/mobile-theme-dark-blue.css">
+    <link rel="stylesheet" href="/platform/main.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; background: #1b222f; color: #d1d4dc; font-family: 'Open Sans', sans-serif; }
+        
+        .trading-layout { display: flex; height: 100vh; width: 100vw; }
+        
+        /* Left sidebar - assets */
+        .left-sidebar { width: 56px; background: #171e28; display: flex; flex-direction: column; align-items: center; z-index: 10; border-right: 1px solid rgba(115,130,153,0.15); }
+        .sidebar-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #888A95; border-radius: 8px; margin: 2px 0; transition: all 0.15s; }
+        .sidebar-icon:hover, .sidebar-icon.active { background: rgba(0,153,250,0.1); color: #00b6f9; }
+        .sidebar-icon svg { width: 22px; height: 22px; }
+        .sidebar-divider { width: 28px; height: 1px; background: rgba(115,130,153,0.2); margin: 4px 0; }
+        
+        /* Center area */
+        .center-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        
+        /* Top bar */
+        .top-bar { height: 48px; background: #171e28; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid rgba(115,130,153,0.15); z-index: 10; }
+        .asset-selector { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: background 0.15s; }
+        .asset-selector:hover { background: rgba(115,130,153,0.1); }
+        .asset-icon { width: 28px; height: 28px; border-radius: 50%; background: rgba(0,153,250,0.15); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #00b6f9; }
+        .asset-info { display: flex; flex-direction: column; }
+        .asset-name { font-size: 13px; font-weight: 600; color: #fff; line-height: 1.2; }
+        .asset-payout { font-size: 11px; color: #45b734; }
+        .chart-type-btns { display: flex; gap: 2px; margin-left: 16px; }
+        .chart-type-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; color: #888A95; transition: all 0.15s; background: none; border: none; }
+        .chart-type-btn:hover { background: rgba(115,130,153,0.1); color: #d1d4dc; }
+        .chart-type-btn.active { background: rgba(0,153,250,0.15); color: #00b6f9; }
+        .chart-type-btn svg { width: 18px; height: 18px; }
+        .timeframe-btns { display: flex; gap: 2px; margin-left: 12px; }
+        .tf-btn { padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; color: #888A95; transition: all 0.15s; background: none; border: none; }
+        .tf-btn:hover { background: rgba(115,130,153,0.1); color: #d1d4dc; }
+        .tf-btn.active { color: #00b6f9; }
+        .top-bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+        
+        /* Chart container */
+        .chart-wrapper { flex: 1; position: relative; min-height: 0; }
+        #chartContainer { width: 100%; height: 100%; }
+        
+        /* Current price overlay */
+        .current-price-overlay { position: absolute; top: 8px; left: 12px; z-index: 5; pointer-events: none; }
+        .cp-symbol { font-size: 14px; font-weight: 700; color: #fff; }
+        .cp-price { font-size: 20px; font-weight: 700; margin-left: 8px; }
+        .cp-price.up { color: #45b734; }
+        .cp-price.down { color: #ff3e1f; }
+        .cp-change { font-size: 12px; margin-left: 4px; }
+        .cp-change.up { color: #45b734; }
+        .cp-change.down { color: #ff3e1f; }
+        
+        /* Right trade panel */
+        .trade-panel { width: 260px; background: #171e28; border-left: 1px solid rgba(115,130,153,0.15); display: flex; flex-direction: column; padding: 0; z-index: 10; }
+        .panel-section { padding: 12px 16px; border-bottom: 1px solid rgba(115,130,153,0.1); }
+        .panel-label { font-size: 11px; color: #888A95; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .panel-row { display: flex; align-items: center; gap: 8px; }
+        
+        /* Account type toggle */
+        .account-toggle { display: flex; background: rgba(115,130,153,0.1); border-radius: 8px; padding: 2px; }
+        .account-btn { flex: 1; padding: 8px 12px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #888A95; transition: all 0.15s; border: none; background: none; }
+        .account-btn.active { background: #00b6f9; color: #fff; }
+        .account-balance { text-align: center; padding: 8px 0; }
+        .account-balance .balance-label { font-size: 11px; color: #888A95; }
+        .account-balance .balance-amount { font-size: 22px; font-weight: 700; color: #fff; }
+        
+        /* Trade amount */
+        .amount-controls { display: flex; align-items: center; gap: 0; }
+        .amount-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(115,130,153,0.1); border: none; cursor: pointer; color: #d1d4dc; font-size: 18px; font-weight: 600; transition: background 0.15s; }
+        .amount-btn:first-child { border-radius: 8px 0 0 8px; }
+        .amount-btn:last-child { border-radius: 0 8px 8px 0; }
+        .amount-btn:hover { background: rgba(115,130,153,0.2); }
+        .amount-input { flex: 1; height: 36px; background: rgba(115,130,153,0.1); border: none; color: #fff; font-size: 16px; font-weight: 600; text-align: center; outline: none; }
+        .amount-input:focus { background: rgba(0,153,250,0.1); }
+        .quick-amounts { display: flex; gap: 4px; margin-top: 6px; }
+        .quick-amt { flex: 1; padding: 4px; text-align: center; background: rgba(115,130,153,0.08); border: none; border-radius: 4px; color: #888A95; font-size: 11px; cursor: pointer; transition: all 0.15s; }
+        .quick-amt:hover { background: rgba(0,153,250,0.15); color: #00b6f9; }
+        
+        /* Duration */
+        .duration-selector { display: flex; gap: 4px; flex-wrap: wrap; }
+        .dur-btn { padding: 6px 10px; border-radius: 6px; background: rgba(115,130,153,0.08); border: none; color: #888A95; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+        .dur-btn:hover { background: rgba(0,153,153,0.15); color: #d1d4dc; }
+        .dur-btn.active { background: rgba(0,153,250,0.15); color: #00b6f9; }
+        
+        /* Payout display */
+        .payout-display { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(69,183,52,0.08); border-radius: 8px; }
+        .payout-label { font-size: 12px; color: #888A95; }
+        .payout-value { font-size: 14px; font-weight: 700; color: #45b734; }
+        
+        /* Call/Put buttons */
+        .trade-buttons { padding: 12px 16px; margin-top: auto; }
+        .trade-btn { width: 100%; height: 52px; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; margin-bottom: 8px; }
+        .trade-btn:last-child { margin-bottom: 0; }
+        .trade-btn.call { background: #45b734; color: #fff; }
+        .trade-btn.call:hover { background: #3da32e; transform: translateY(-1px); }
+        .trade-btn.call:active { transform: translateY(0); }
+        .trade-btn.put { background: #ff3e1f; color: #fff; }
+        .trade-btn.put:hover { background: #e63618; transform: translateY(-1px); }
+        .trade-btn.put:active { transform: translateY(0); }
+        .trade-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .trade-btn .arrow { font-size: 20px; }
+        .trade-btn .label { font-size: 13px; opacity: 0.9; }
+        .trade-btn .pct { font-size: 11px; opacity: 0.7; }
+        
+        /* Open deals bar */
+        .open-deals { position: absolute; bottom: 0; left: 0; right: 260px; background: rgba(23,30,40,0.95); border-top: 1px solid rgba(115,130,153,0.15); max-height: 120px; overflow-y: auto; z-index: 5; display: none; }
+        .open-deals.has-deals { display: block; }
+        .deals-header { padding: 8px 12px; font-size: 11px; color: #888A95; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(115,130,153,0.1); display: flex; justify-content: space-between; }
+        .deal-item { display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid rgba(115,130,153,0.05); gap: 12px; }
+        .deal-dir { width: 6px; height: 28px; border-radius: 3px; }
+        .deal-dir.call { background: #45b734; }
+        .deal-dir.put { background: #ff3e1f; }
+        .deal-asset { font-size: 13px; font-weight: 600; color: #fff; min-width: 80px; }
+        .deal-amount { font-size: 13px; color: #d1d4dc; }
+        .deal-timer { font-size: 12px; font-weight: 600; color: #00b6f9; min-width: 40px; text-align: center; }
+        .deal-pnl { font-size: 13px; font-weight: 600; margin-left: auto; }
+        .deal-pnl.pending { color: #888A95; }
+        .deal-pnl.win { color: #45b734; }
+        .deal-pnl.loss { color: #ff3e1f; }
+        
+        /* Asset dropdown */
+        .asset-dropdown { position: absolute; top: 48px; left: 56px; width: 340px; max-height: 70vh; background: #1b222f; border: 1px solid rgba(115,130,153,0.2); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 100; display: none; overflow: hidden; }
+        .asset-dropdown.open { display: block; }
+        .asset-search { padding: 12px; border-bottom: 1px solid rgba(115,130,153,0.1); }
+        .asset-search input { width: 100%; height: 36px; background: rgba(115,130,153,0.1); border: none; border-radius: 8px; padding: 0 12px; color: #fff; font-size: 13px; outline: none; }
+        .asset-search input::placeholder { color: #888A95; }
+        .asset-search input:focus { background: rgba(0,153,250,0.1); }
+        .asset-tabs { display: flex; padding: 0 12px; gap: 0; border-bottom: 1px solid rgba(115,130,153,0.1); }
+        .asset-tab { padding: 8px 12px; font-size: 12px; font-weight: 600; color: #888A95; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+        .asset-tab:hover { color: #d1d4dc; }
+        .asset-tab.active { color: #00b6f9; border-bottom-color: #00b6f9; }
+        .asset-list { max-height: 50vh; overflow-y: auto; }
+        .asset-list-item { display: flex; align-items: center; padding: 10px 12px; cursor: pointer; transition: background 0.1s; gap: 10px; }
+        .asset-list-item:hover { background: rgba(0,153,250,0.08); }
+        .asset-list-item.selected { background: rgba(0,153,250,0.12); }
+        .ali-icon { width: 32px; height: 32px; border-radius: 50%; background: rgba(0,153,250,0.1); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #00b6f9; flex-shrink: 0; }
+        .ali-name { font-size: 13px; font-weight: 600; color: #fff; flex: 1; }
+        .ali-payout { font-size: 13px; font-weight: 600; color: #45b734; }
+        .ali-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(0,153,250,0.1); color: #00b6f9; margin-left: 6px; }
+
+        /* Result notification */
+        .trade-result { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; padding: 24px 48px; border-radius: 16px; text-align: center; animation: resultPop 0.3s ease-out; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+        .trade-result.show { opacity: 1; }
+        .trade-result.win { background: rgba(69,183,52,0.95); }
+        .trade-result.loss { background: rgba(255,62,31,0.95); }
+        .trade-result .result-amount { font-size: 32px; font-weight: 700; color: #fff; }
+        .trade-result .result-label { font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 4px; }
+        @keyframes resultPop { 0% { transform: translate(-50%, -50%) scale(0.8); } 100% { transform: translate(-50%, -50%) scale(1); } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(115,130,153,0.3); border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <div class="trading-layout">
+        <!-- Left sidebar -->
+        <div class="left-sidebar">
+            <div class="sidebar-icon active" title="Trading" onclick="window.location='/cabinet/trading/'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+            </div>
+            <div class="sidebar-icon" title="Market" onclick="window.location='/cabinet/market/'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M6 12h12"/></svg>
+            </div>
+            <div class="sidebar-icon" title="Social Trading">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-icon" title="Achievements">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            </div>
+            <div class="sidebar-icon" title="Gem Lotto">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div style="flex:1"></div>
+            <div class="sidebar-icon" title="Deposit" onclick="window.location='/cabinet/deposit/'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/></svg>
+            </div>
+            <div class="sidebar-icon" title="Profile" onclick="window.location='/cabinet/profile/'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="sidebar-icon" title="Settings" onclick="window.location='/cabinet/settings/'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+        </div>
+
+        <!-- Center area -->
+        <div class="center-area">
+            <!-- Top bar -->
+            <div class="top-bar">
+                <div class="asset-selector" id="assetSelectorBtn">
+                    <div class="asset-icon" id="assetIcon">EU</div>
+                    <div class="asset-info">
+                        <div class="asset-name" id="assetName">EUR/USD (OTC)</div>
+                        <div class="asset-payout">Payout: <span id="assetPayout">85</span>%</div>
+                    </div>
+                </div>
+                
+                <div class="chart-type-btns">
+                    <button class="chart-type-btn" data-type="line" title="Line">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 17 8 11 13 15 21 5"/></svg>
+                    </button>
+                    <button class="chart-type-btn active" data-type="candles" title="Candles">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="4" height="16" rx="1"/><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="17" y="6" width="4" height="12" rx="1"/></svg>
+                    </button>
+                    <button class="chart-type-btn" data-type="bars" title="Bars">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="4" x2="5" y2="20"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="19" y1="8" x2="19" y2="16"/></svg>
+                    </button>
+                    <button class="chart-type-btn" data-type="heiken-ashi" title="Heikin Ashi">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="4" height="14" rx="1" fill="rgba(69,183,52,0.3)"/><rect x="10" y="3" width="4" height="18" rx="1" fill="rgba(255,62,31,0.3)"/><rect x="17" y="7" width="4" height="10" rx="1" fill="rgba(69,183,52,0.3)"/></svg>
+                    </button>
+                </div>
+                
+                <div class="timeframe-btns">
+                    <button class="tf-btn" data-tf="15">5S</button>
+                    <button class="tf-btn" data-tf="30">10S</button>
+                    <button class="tf-btn" data-tf="60" style="display:none"></button>
+                    <button class="tf-btn" data-tf="60" style="display:none"></button>
+                    <button class="tf-btn" data-tf="300">M5</button>
+                    <button class="tf-btn active" data-tf="60">M1</button>
+                    <button class="tf-btn" data-tf="900">M15</button>
+                    <button class="tf-btn" data-tf="3600">H1</button>
+                    <button class="tf-btn" data-tf="14400">H4</button>
+                    <button class="tf-btn" data-tf="86400">D1</button>
+                </div>
+                
+                <div class="top-bar-right">
+                    <div style="font-size:12px;color:#888A95;display:flex;align-items:center;gap:6px">
+                        <span id="currentAccountLabel" style="color:#00b6f9;font-weight:600">Demo</span>
+                        <span id="topBarBalance" style="color:#fff;font-weight:600">$10,000.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chart -->
+            <div class="chart-wrapper">
+                <div class="current-price-overlay">
+                    <span class="cp-symbol" id="cpSymbol">EUR/USD (OTC)</span>
+                    <span class="cp-price up" id="cpPrice">1.08500</span>
+                    <span class="cp-change up" id="cpChange">+0.00012 (+0.01%)</span>
+                </div>
+                <div id="chartContainer"></div>
+                <div class="open-deals" id="openDeals">
+                    <div class="deals-header">
+                        <span>Open Trades</span>
+                        <span id="dealCount">0</span>
+                    </div>
+                    <div id="dealsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right trade panel -->
+        <div class="trade-panel">
+            <!-- Account toggle -->
+            <div class="panel-section">
+                <div class="account-toggle">
+                    <button class="account-btn active" data-account="demo" id="btnDemo" onclick="POTrading.switchAccount('demo')">Demo</button>
+                    <button class="account-btn" data-account="real" id="btnReal" onclick="POTrading.switchAccount('real')">Real</button>
+                </div>
+                <div class="account-balance">
+                    <div class="balance-label" id="balanceLabel">Demo Balance</div>
+                    <div class="balance-amount" id="balanceAmount">$10,000.00</div>
+                </div>
+            </div>
+            
+            <!-- Trade amount -->
+            <div class="panel-section">
+                <div class="panel-label">Trade Amount</div>
+                <div class="amount-controls">
+                    <button class="amount-btn" onclick="POTrading.changeAmount(-1)">-</button>
+                    <input type="number" class="amount-input" id="tradeAmount" value="100" min="1" step="1" onchange="POTrading.updateAmount(this.value)">
+                    <button class="amount-btn" onclick="POTrading.changeAmount(1)">+</button>
+                </div>
+                <div class="quick-amounts">
+                    <button class="quick-amt" onclick="POTrading.setAmount(5)">$5</button>
+                    <button class="quick-amt" onclick="POTrading.setAmount(10)">$10</button>
+                    <button class="quick-amt" onclick="POTrading.setAmount(50)">$50</button>
+                    <button class="quick-amt" onclick="POTrading.setAmount(100)">$100</button>
+                    <button class="quick-amt" onclick="POTrading.setAmount(500)">$500</button>
+                    <button class="quick-amt" onclick="POTrading.setAmount(1000)">$1K</button>
+                </div>
+            </div>
+            
+            <!-- Duration -->
+            <div class="panel-section">
+                <div class="panel-label">Duration</div>
+                <div class="duration-selector" id="durationSelector">
+                    <button class="dur-btn" data-dur="15">15s</button>
+                    <button class="dur-btn" data-dur="30">30s</button>
+                    <button class="dur-btn active" data-dur="60">1m</button>
+                    <button class="dur-btn" data-dur="120">2m</button>
+                    <button class="dur-btn" data-dur="300">5m</button>
+                    <button class="dur-btn" data-dur="600">10m</button>
+                    <button class="dur-btn" data-dur="900">15m</button>
+                    <button class="dur-btn" data-dur="1800">30m</button>
+                    <button class="dur-btn" data-dur="3600">1h</button>
+                </div>
+            </div>
+            
+            <!-- Payout -->
+            <div class="panel-section">
+                <div class="payout-display">
+                    <div>
+                        <div class="payout-label">Payout</div>
+                        <div class="payout-value" id="payoutPercent">+85%</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div class="payout-label">Profit</div>
+                        <div class="payout-value" id="payoutAmount">$85.00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trade buttons -->
+            <div class="trade-buttons">
+                <button class="trade-btn call" id="btnCall" onclick="POTrading.placeTrade('call')">
+                    <span class="arrow">&#9650;</span>
+                    <span class="label">Higher</span>
+                    <span class="pct" id="callPayout">+85%</span>
+                </button>
+                <button class="trade-btn put" id="btnPut" onclick="POTrading.placeTrade('put')">
+                    <span class="arrow">&#9660;</span>
+                    <span class="label">Lower</span>
+                    <span class="pct" id="putPayout">+85%</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asset dropdown -->
+    <div class="asset-dropdown" id="assetDropdown">
+        <div class="asset-search">
+            <input type="text" placeholder="Search assets..." id="assetSearchInput">
+        </div>
+        <div class="asset-tabs">
+            <div class="asset-tab active" data-filter="all">All</div>
+            <div class="asset-tab" data-filter="forex">Forex</div>
+            <div class="asset-tab" data-filter="crypto">Crypto</div>
+            <div class="asset-tab" data-filter="commodity">Commodities</div>
+        </div>
+        <div class="asset-list" id="assetList"></div>
+    </div>
+
+    <!-- Trade result notification -->
+    <div class="trade-result" id="tradeResult">
+        <div class="result-amount" id="resultAmount">+$85.00</div>
+        <div class="result-label" id="resultLabel">Profit</div>
+    </div>
+
+    <script src="/js/modules/api.js"></script>
+    <script src="/js/modules/chart.js"></script>
+    <script>
+    window.POTrading = (function() {
+        let chart = null;
+        let currentSymbol = 'EURUSD_otc';
+        let currentAmount = 100;
+        let currentDuration = 60;
+        let currentAccount = 'demo';
+        let activeTrades = [];
+        let tradeTimers = {};
+
+        const assets = [
+            { id: 'EURUSD_otc', name: 'EUR/USD (OTC)', type: 'forex', payout: 85, icon: 'EU' },
+            { id: 'GBPUSD_otc', name: 'GBP/USD (OTC)', type: 'forex', payout: 85, icon: 'GU' },
+            { id: 'USDJPY_otc', name: 'USD/JPY (OTC)', type: 'forex', payout: 85, icon: 'UJ' },
+            { id: 'AUDUSD_otc', name: 'AUD/USD (OTC)', type: 'forex', payout: 82, icon: 'AU' },
+            { id: 'USDCAD_otc', name: 'USD/CAD (OTC)', type: 'forex', payout: 82, icon: 'UC' },
+            { id: 'EURGBP_otc', name: 'EUR/GBP (OTC)', type: 'forex', payout: 80, icon: 'EG' },
+            { id: 'BTCUSD', name: 'Bitcoin/USD', type: 'crypto', payout: 90, icon: 'BT' },
+            { id: 'ETHUSD', name: 'Ethereum/USD', type: 'crypto', payout: 88, icon: 'ET' },
+            { id: 'XAUUSD', name: 'Gold/USD', type: 'commodity', payout: 85, icon: 'AU' },
+            { id: 'USOIL', name: 'Crude Oil', type: 'commodity', payout: 83, icon: 'CL' },
+        ];
+
+        function init() {
+            chart = new POChart('chartContainer');
+            chart.init();
+            
+            chart.on('tick', onTick);
+            
+            setupChartTypeButtons();
+            setupTimeframeButtons();
+            setupDurationButtons();
+            setupAssetSelector();
+            updatePayout();
+            updateBalance();
+        }
+
+        function onTick(candle) {
+            const priceEl = document.getElementById('cpPrice');
+            const changeEl = document.getElementById('cpChange');
+            if (!priceEl) return;
+            
+            const prev = chart.data.length > 1 ? chart.data[chart.data.length - 2] : candle;
+            const change = candle.close - prev.close;
+            const changePct = (change / prev.close * 100);
+            const sign = change >= 0 ? '+' : '';
+            const cls = change >= 0 ? 'up' : 'down';
+            
+            priceEl.textContent = candle.close.toFixed(chart.getPrecision());
+            priceEl.className = 'cp-price ' + cls;
+            changeEl.textContent = sign + change.toFixed(chart.getPrecision()) + ' (' + sign + changePct.toFixed(2) + '%)';
+            changeEl.className = 'cp-change ' + cls;
+            
+            updateActiveTrades();
+        }
+
+        function setupChartTypeButtons() {
+            document.querySelectorAll('.chart-type-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    chart.setChartType(btn.dataset.type);
+                });
+            });
+        }
+
+        function setupTimeframeButtons() {
+            document.querySelectorAll('.tf-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    chart.setTimeframe(parseInt(btn.dataset.tf));
+                });
+            });
+        }
+
+        function setupDurationButtons() {
+            document.querySelectorAll('.dur-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentDuration = parseInt(btn.dataset.dur);
+                });
+            });
+        }
+
+        function setupAssetSelector() {
+            const btn = document.getElementById('assetSelectorBtn');
+            const dropdown = document.getElementById('assetDropdown');
+            const searchInput = document.getElementById('assetSearchInput');
+            
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+                if (dropdown.classList.contains('open')) {
+                    renderAssetList();
+                    searchInput.focus();
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            });
+            
+            searchInput.addEventListener('input', () => renderAssetList());
+            
+            document.querySelectorAll('.asset-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.asset-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderAssetList();
+                });
+            });
+            
+            renderAssetList();
+        }
+
+        function renderAssetList(filter = null) {
+            const list = document.getElementById('assetList');
+            const search = document.getElementById('assetSearchInput').value.toLowerCase();
+            const activeTab = document.querySelector('.asset-tab.active');
+            const typeFilter = activeTab ? activeTab.dataset.filter : 'all';
+            
+            let filtered = assets;
+            if (search) filtered = filtered.filter(a => a.name.toLowerCase().includes(search));
+            if (typeFilter !== 'all') filtered = filtered.filter(a => a.type === typeFilter);
+            
+            list.innerHTML = filtered.map(a => `
+                <div class="asset-list-item ${a.id === currentSymbol ? 'selected' : ''}" onclick="POTrading.selectAsset('${a.id}')">
+                    <div class="ali-icon">${a.icon}</div>
+                    <div class="ali-name">${a.name}${a.id.includes('otc') ? '<span class="ali-tag">OTC</span>' : ''}</div>
+                    <div class="ali-payout">${a.payout}%</div>
+                </div>
+            `).join('');
+        }
+
+        function selectAsset(symbolId) {
+            currentSymbol = symbolId;
+            chart.setSymbol(symbolId);
+            
+            const asset = assets.find(a => a.id === symbolId);
+            if (asset) {
+                document.getElementById('assetIcon').textContent = asset.icon;
+                document.getElementById('assetName').textContent = asset.name;
+                document.getElementById('assetPayout').textContent = asset.payout;
+                document.getElementById('cpSymbol').textContent = asset.name;
+            }
+            
+            updatePayout();
+            document.getElementById('assetDropdown').classList.remove('open');
+        }
+
+        function updatePayout() {
+            const asset = assets.find(a => a.id === currentSymbol);
+            const pct = asset ? asset.payout : 85;
+            const profit = currentAmount * (pct / 100);
+            
+            document.getElementById('payoutPercent').textContent = '+' + pct + '%';
+            document.getElementById('payoutAmount').textContent = '$' + profit.toFixed(2);
+            document.getElementById('callPayout').textContent = '+' + pct + '%';
+            document.getElementById('putPayout').textContent = '+' + pct + '%';
+        }
+
+        function changeAmount(delta) {
+            const amounts = [1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+            let idx = amounts.findIndex(a => a >= currentAmount);
+            if (idx === -1) idx = amounts.length - 1;
+            if (delta > 0) {
+                currentAmount = amounts[Math.min(idx + 1, amounts.length - 1)];
+            } else {
+                currentAmount = amounts[Math.max(idx - 1, 0)];
+            }
+            document.getElementById('tradeAmount').value = currentAmount;
+            updatePayout();
+        }
+
+        function setAmount(amt) {
+            currentAmount = amt;
+            document.getElementById('tradeAmount').value = amt;
+            updatePayout();
+        }
+
+        function updateAmount(val) {
+            currentAmount = Math.max(1, parseInt(val) || 1);
+            updatePayout();
+        }
+
+        function switchAccount(type) {
+            currentAccount = type;
+            document.querySelectorAll('.account-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.account === type);
+            });
+            document.getElementById('balanceLabel').textContent = type === 'demo' ? 'Demo Balance' : 'Real Balance';
+            updateBalance();
+        }
+
+        function updateBalance() {
+            const balances = POAPI.getBalances();
+            const bal = currentAccount === 'demo' ? balances.demo : balances.real;
+            const prefix = currentAccount === 'demo' ? '$' : '$';
+            document.getElementById('balanceAmount').textContent = prefix + bal.toFixed(2);
+            document.getElementById('topBarBalance').textContent = '$' + bal.toFixed(2);
+            document.getElementById('currentAccountLabel').textContent = currentAccount === 'demo' ? 'Demo' : 'Real';
+            
+            const canTrade = bal >= currentAmount;
+            document.getElementById('btnCall').disabled = !canTrade;
+            document.getElementById('btnPut').disabled = !canTrade;
+        }
+
+        function placeTrade(direction) {
+            const price = chart.getCurrentPrice();
+            const asset = assets.find(a => a.id === currentSymbol);
+            const payout = asset ? asset.payout : 85;
+            
+            const trade = {
+                id: 'trade_' + Date.now(),
+                symbol: currentSymbol,
+                symbolName: asset ? asset.name : currentSymbol,
+                amount: currentAmount,
+                direction: direction,
+                duration: currentDuration,
+                entryPrice: price,
+                payout: payout,
+                status: 'active',
+                openedAt: Date.now(),
+                expiresAt: Date.now() + currentDuration * 1000,
+                accountType: currentAccount,
+                profit: 0
+            };
+            
+            const balances = POAPI.getBalances();
+            const balKey = currentAccount === 'demo' ? 'demo' : 'real';
+            if (balances[balKey] < currentAmount) {
+                alert('Insufficient balance');
+                return;
+            }
+            
+            balances[balKey] -= currentAmount;
+            localStorage.setItem('po_balances', JSON.stringify(balances));
+            
+            activeTrades.push(trade);
+            updateBalance();
+            updateOpenDeals();
+            
+            tradeTimers[trade.id] = setInterval(() => {
+                const remaining = Math.max(0, Math.ceil((trade.expiresAt - Date.now()) / 1000));
+                const timerEl = document.getElementById('timer_' + trade.id);
+                if (timerEl) timerEl.textContent = remaining + 's';
+                
+                if (remaining <= 0) {
+                    resolveTrade(trade);
+                }
+            }, 250);
+            
+            const sound = new Audio('/assets/sounds/deal-open.mp3');
+            sound.play().catch(() => {});
+        }
+
+        function resolveTrade(trade) {
+            clearInterval(tradeTimers[trade.id]);
+            delete tradeTimers[trade.id];
+            
+            const currentPrice = chart.getCurrentPrice();
+            let won = false;
+            if (trade.direction === 'call') {
+                won = currentPrice > trade.entryPrice;
+            } else {
+                won = currentPrice < trade.entryPrice;
+            }
+            
+            trade.status = 'closed';
+            trade.closePrice = currentPrice;
+            
+            const balances = POAPI.getBalances();
+            const balKey = trade.accountType === 'demo' ? 'demo' : 'real';
+            
+            if (won) {
+                const profit = trade.amount * (trade.payout / 100);
+                trade.profit = profit;
+                balances[balKey] += trade.amount + profit;
+                showResult(true, '+$' + profit.toFixed(2));
+                const sound = new Audio('/assets/sounds/deal-win.mp3');
+                sound.play().catch(() => {});
+            } else {
+                trade.profit = -trade.amount;
+                balances[balKey] += 0;
+                showResult(false, '-$' + trade.amount.toFixed(2));
+                const sound = new Audio('/assets/sounds/deal-loose.mp3');
+                sound.play().catch(() => {});
+            }
+            
+            localStorage.setItem('po_balances', JSON.stringify(balances));
+            
+            const tradeHistory = JSON.parse(localStorage.getItem('po_trades') || '[]');
+            tradeHistory.unshift(trade);
+            localStorage.setItem('po_trades', JSON.stringify(tradeHistory));
+            
+            activeTrades = activeTrades.filter(t => t.id !== trade.id);
+            updateBalance();
+            updateOpenDeals();
+        }
+
+        function showResult(isWin, amountText) {
+            const el = document.getElementById('tradeResult');
+            const amountEl = document.getElementById('resultAmount');
+            const labelEl = document.getElementById('resultLabel');
+            
+            el.className = 'trade-result show ' + (isWin ? 'win' : 'loss');
+            amountEl.textContent = amountText;
+            labelEl.textContent = isWin ? 'Profit' : 'Loss';
+            
+            setTimeout(() => { el.className = 'trade-result'; }, 2500);
+        }
+
+        function updateActiveTrades() {
+            activeTrades.forEach(trade => {
+                const pnlEl = document.getElementById('pnl_' + trade.id);
+                if (!pnlEl) return;
+                
+                const currentPrice = chart.getCurrentPrice();
+                let pnl = 0;
+                if (trade.direction === 'call') {
+                    pnl = (currentPrice - trade.entryPrice) * trade.amount * 100;
+                } else {
+                    pnl = (trade.entryPrice - currentPrice) * trade.amount * 100;
+                }
+                
+                pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2);
+                pnlEl.className = 'deal-pnl ' + (pnl >= 0 ? 'win' : 'loss');
+            });
+        }
+
+        function updateOpenDeals() {
+            const container = document.getElementById('openDeals');
+            const list = document.getElementById('dealsList');
+            const countEl = document.getElementById('dealCount');
+            
+            if (activeTrades.length === 0) {
+                container.classList.remove('has-deals');
+                return;
+            }
+            
+            container.classList.add('has-deals');
+            countEl.textContent = activeTrades.length;
+            
+            list.innerHTML = activeTrades.map(t => {
+                const remaining = Math.max(0, Math.ceil((t.expiresAt - Date.now()) / 1000));
+                return `
+                    <div class="deal-item">
+                        <div class="deal-dir ${t.direction}"></div>
+                        <div class="deal-asset">${t.symbolName}</div>
+                        <div class="deal-amount">$${t.amount}</div>
+                        <div class="deal-timer" id="timer_${t.id}">${remaining}s</div>
+                        <div class="deal-pnl pending" id="pnl_${t.id}">...</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        return {
+            switchAccount, changeAmount, setAmount, updateAmount, selectAsset, placeTrade
+        };
+    })();
+    </script>
+</body>
+</html>
